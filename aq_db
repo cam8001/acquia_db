@@ -1,0 +1,46 @@
+#!/usr/bin/php
+<?php
+/**
+* Script to get the database credentials for a database on Acquia hosting.
+*
+* Use it like this: mysql `aq_db databasename test` to connect to databasename
+* in the test (staging) environment.
+*/
+
+
+if (isset($argv[1]) == FALSE || isset($argv[2]) == FALSE) {
+  fwrite(STDERR, "You must provide two arguments: db_name and environment.\r\n");
+  fwrite(STDERR, "Example: {$argv[0]} syfy_fr_kola dev\r\n");
+  exit(1);
+}
+else {
+  $db_name = $argv[1];
+  $env = $argv[2];
+}
+
+$acquia_user = getenv('USER');
+// Prod files don't have the env name as part of the filename.
+$file_env = $env == 'prod' ? '' : $env;
+$path = "/var/www/site-php/{$acquia_user}.{$env}/D7-{$acquia_user}{$file_env}-settings.inc";
+
+if (file_exists($path) == FALSE) {
+  fwrite(STDERR, "Bad environment passed - can't find the include file at $path\r\n");
+  exit(1);
+}
+
+//fwrite(STDOUT, $path . "\r\n");
+//exit;
+
+// Include the settings script and pull out the relative info.
+$settings_script = file_get_contents($path);
+$settings_script = substr($settings_script, 0, strpos($settings_script, "// HA database info for 'default'."));
+$settings_script = str_replace("<?php", '', $settings_script);
+
+eval($settings_script);
+//fwrite(STDOUT, print_r($databases)); 
+
+$db_credentials = $databases[$db_name]['default'];
+
+$output = " -u{$db_credentials['username']} -p{$db_credentials['password']} {$db_credentials['database']}";
+fwrite(STDOUT, $output);
+
