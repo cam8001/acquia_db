@@ -31,7 +31,7 @@ if (file_exists($path) == FALSE) {
 //fwrite(STDOUT, $path . "\r\n");
 //exit;
 
-// Include the settings script and pull out the relative info.
+// Include the settings script and pull out the relavant info.
 $settings_script = file_get_contents($path);
 $settings_script = substr($settings_script, 0, strpos($settings_script, "// HA database info for 'default'."));
 $settings_script = str_replace("<?php", '', $settings_script);
