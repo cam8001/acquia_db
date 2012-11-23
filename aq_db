@@ -31,16 +31,16 @@ if (file_exists($path) == FALSE) {
 //fwrite(STDOUT, $path . "\r\n");
 //exit;
 
-// Include the settings script and pull out the relavant info.
+// Include the settings script and pull out the relative info.
 $settings_script = file_get_contents($path);
 $settings_script = substr($settings_script, 0, strpos($settings_script, "// HA database info for 'default'."));
 $settings_script = str_replace("<?php", '', $settings_script);
 
 eval($settings_script);
-//fwrite(STDOUT, print_r($databases)); 
+//fwrite(STDOUT, print_r($databases));
 
 $db_credentials = $databases[$db_name]['default'];
 
-$output = " -u{$db_credentials['username']} -p{$db_credentials['password']} {$db_credentials['database']}";
+$output = " -u{$db_credentials['username']} -p{$db_credentials['password']} -h{$db_credentials['host']} {$db_credentials['database']}";
 fwrite(STDOUT, $output);
 
